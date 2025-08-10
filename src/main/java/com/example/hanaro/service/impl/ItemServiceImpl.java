@@ -38,14 +38,7 @@ public class ItemServiceImpl implements ItemService {
 	@Override
 	public ItemResponseDto getItem(int id) {
 		Item item = repository.findById(id).orElseThrow();
-		List<ItemImages> images = imagesRepository.findAllByitemId(id);
-		List<ItemImageDto> itemImageDto = images
-			.stream().map(im -> ItemImageDto.builder()
-					.savedir(im.getSavedir())
-					.savename(im.getSavename())
-					.itemId(im.getId())
-					.build()
-				).toList();
+		List<ItemImageDto> itemImageDto = getItemImageDtos(id);
 		return ItemResponseDto.builder()
 			.stock(item.getStock())
 			.price(item.getPrice())
@@ -54,4 +47,6 @@ public class ItemServiceImpl implements ItemService {
 			.images(itemImageDto)
 			.build();
 	}
+
+
 }

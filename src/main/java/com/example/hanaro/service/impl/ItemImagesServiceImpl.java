@@ -1,9 +1,11 @@
 package com.example.hanaro.service.impl;
 
 import java.nio.file.Paths;
+import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.example.hanaro.dto.ItemImageDto;
 import com.example.hanaro.entity.Item;
 import com.example.hanaro.entity.ItemImages;
 import com.example.hanaro.repository.ItemImagesRepository;
@@ -28,5 +30,17 @@ public class ItemImagesServiceImpl implements ItemImagesService {
 			.build();
 
 		repository.save(itemImage);
+	}
+
+	private List<ItemImageDto> getItemImageDtos(int id) {
+		List<ItemImages> images = repository.findAllByitemId(id);
+		List<ItemImageDto> itemImageDto = images
+			.stream().map(im -> ItemImageDto.builder()
+				.savedir(im.getSavedir())
+				.savename(im.getSavename())
+				.itemId(im.getId())
+				.build()
+			).toList();
+		return itemImageDto;
 	}
 }

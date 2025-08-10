@@ -45,3 +45,6 @@ mysql/
 http-client.env.json
 ### application.properties ###
 src/main/resources/application.properties
+
+### upload directory ###
+src/main/resources/static/upload/
