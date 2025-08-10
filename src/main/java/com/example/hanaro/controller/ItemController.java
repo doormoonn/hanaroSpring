@@ -70,6 +70,7 @@ public class ItemController {
 		if (item != null) {
 			return ResponseEntity.ok(item);
 		}
+		
 		return ResponseEntity.notFound().build();
 	}
 
@@ -83,7 +84,6 @@ public class ItemController {
 
 			return ResponseEntity.ok("Item updated successfully");
 		}
-
 			return ResponseEntity.notFound().build();
 	}
 	//
