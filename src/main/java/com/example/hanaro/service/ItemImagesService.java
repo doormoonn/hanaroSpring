@@ -8,4 +8,5 @@ import com.example.hanaro.entity.Item;
 public interface ItemImagesService {
 	void saveImg(Item item, String imgPath);
 	List<ItemImageDto> getItemImageDtos(int id);
+	void deleteImg(int id);
 }

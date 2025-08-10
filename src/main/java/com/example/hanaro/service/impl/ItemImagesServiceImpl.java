@@ -11,6 +11,7 @@ import com.example.hanaro.entity.ItemImages;
 import com.example.hanaro.repository.ItemImagesRepository;
 import com.example.hanaro.service.ItemImagesService;
 
+import org.springframework.transaction.annotation.Transactional; // 이것으로 변경
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -34,7 +35,7 @@ public class ItemImagesServiceImpl implements ItemImagesService {
 
 	@Override
 	public List<ItemImageDto> getItemImageDtos(int id) {
-		List<ItemImages> images = repository.findAllByitemId(id);
+		List<ItemImages> images = repository.findAllByItemId(id);
 		return images
 			.stream().map(im -> ItemImageDto.builder()
 				.savedir(im.getSavedir())
@@ -42,5 +43,10 @@ public class ItemImagesServiceImpl implements ItemImagesService {
 				.itemId(im.getId())
 				.build()
 			).toList();
+	}
+
+	@Override
+	public void deleteImg(int id) {
+		repository.deleteAllByItemId(id);
 	}
 }

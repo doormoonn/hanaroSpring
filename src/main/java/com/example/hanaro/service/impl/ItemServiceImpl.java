@@ -3,6 +3,7 @@ package com.example.hanaro.service.impl;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hanaro.dto.ItemImageDto;
 import com.example.hanaro.dto.ItemRequestDto;
@@ -60,6 +61,13 @@ public class ItemServiceImpl implements ItemService {
 			.id(id)
 			.build();
 		repository.save(item);
+	}
+
+	@Transactional
+	@Override
+	public void deleteItem(int id) {
+		imagesService.deleteImg(id);
+		repository.deleteById(id);
 	}
 
 }

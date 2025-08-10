@@ -1,11 +1,11 @@
 package com.example.hanaro.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -70,7 +70,7 @@ public class ItemController {
 		if (item != null) {
 			return ResponseEntity.ok(item);
 		}
-		
+
 		return ResponseEntity.notFound().build();
 	}
 
@@ -86,17 +86,17 @@ public class ItemController {
 		}
 			return ResponseEntity.notFound().build();
 	}
-	//
-	// @Tag(name = "item")
-	// @Operation(summary = "Delete item")
-	// @DeleteMapping("/{id}")
-	// public ResponseEntity<String> deleteItem(@PathVariable Long id) {
-	// 	Optional<Item> item = itemService.findItemById(id);
-	// 	if (!item.isPresent()) {
-	// 		return ResponseEntity.notFound().build();
-	// 	}
-	//
-	// 	itemService.deleteItem(id);
-	// 	return ResponseEntity.ok("Item deleted successfully");
-	// }
+
+	@Tag(name = "item")
+	@Operation(summary = "Delete item")
+	@DeleteMapping("/{id}")
+	public ResponseEntity<String> deleteItem(@PathVariable int id) {
+		ItemResponseDto item = itemService.getItem(id);
+		if (item != null) {
+			itemService.deleteItem(id);
+			return ResponseEntity.ok("Item deleted successfully");
+		}
+
+			return ResponseEntity.notFound().build();
+	}
 }
