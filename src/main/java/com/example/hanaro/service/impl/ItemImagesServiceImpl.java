@@ -32,15 +32,15 @@ public class ItemImagesServiceImpl implements ItemImagesService {
 		repository.save(itemImage);
 	}
 
-	private List<ItemImageDto> getItemImageDtos(int id) {
+	@Override
+	public List<ItemImageDto> getItemImageDtos(int id) {
 		List<ItemImages> images = repository.findAllByitemId(id);
-		List<ItemImageDto> itemImageDto = images
+		return images
 			.stream().map(im -> ItemImageDto.builder()
 				.savedir(im.getSavedir())
 				.savename(im.getSavename())
 				.itemId(im.getId())
 				.build()
 			).toList();
-		return itemImageDto;
 	}
 }

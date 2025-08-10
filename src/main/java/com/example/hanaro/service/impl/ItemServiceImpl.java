@@ -1,18 +1,16 @@
 package com.example.hanaro.service.impl;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
 import com.example.hanaro.dto.ItemImageDto;
 import com.example.hanaro.dto.ItemRequestDto;
 import com.example.hanaro.dto.ItemResponseDto;
+import com.example.hanaro.dto.ItemUpdateDto;
 import com.example.hanaro.entity.Item;
-import com.example.hanaro.entity.ItemImages;
-import com.example.hanaro.repository.ItemImagesRepository;
 import com.example.hanaro.repository.ItemRepository;
+import com.example.hanaro.service.ItemImagesService;
 import com.example.hanaro.service.ItemService;
 
 import lombok.RequiredArgsConstructor;
@@ -21,11 +19,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 	private final ItemRepository repository;
-	private final ItemImagesRepository imagesRepository;
+	private final ItemImagesService imagesService;
 
 	@Override
 	public Item saveItem(ItemRequestDto dto) {
-
 		Item item = Item.builder()
 			.stock(dto.getStock())
 			.content(dto.getContent())
@@ -38,7 +35,7 @@ public class ItemServiceImpl implements ItemService {
 	@Override
 	public ItemResponseDto getItem(int id) {
 		Item item = repository.findById(id).orElseThrow();
-		List<ItemImageDto> itemImageDto = getItemImageDtos(id);
+		List<ItemImageDto> itemImageDto = imagesService.getItemImageDtos(id);
 		return ItemResponseDto.builder()
 			.stock(item.getStock())
 			.price(item.getPrice())
@@ -48,5 +45,21 @@ public class ItemServiceImpl implements ItemService {
 			.build();
 	}
 
+	@Override
+	public List<Item> getAllItems() {
+		return repository.findAll();
+	}
+
+	@Override
+	public void updateItem(int id, ItemUpdateDto dto) {
+		Item item = Item.builder()
+			.stock(dto.getStock())
+			.content(dto.getContent())
+			.price(dto.getPrice())
+			.name(dto.getName())
+			.id(id)
+			.build();
+		repository.save(item);
+	}
 
 }
