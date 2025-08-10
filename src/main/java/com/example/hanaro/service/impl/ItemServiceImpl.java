@@ -38,7 +38,7 @@ public class ItemServiceImpl implements ItemService {
 	@Override
 	public ItemResponseDto getItem(int id) {
 		Item item = repository.findById(id).orElseThrow();
-		List<ItemImages> images = imagesRepository.findAllById(Collections.singleton(id));
+		List<ItemImages> images = imagesRepository.findAllByitemId(id);
 		List<ItemImageDto> itemImageDto = images
 			.stream().map(im -> ItemImageDto.builder()
 					.savedir(im.getSavedir())
