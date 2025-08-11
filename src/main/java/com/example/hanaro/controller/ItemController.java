@@ -5,12 +5,12 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,9 +38,10 @@ public class ItemController {
 	private final ItemService itemService;
 	private final ItemImagesService itemImagesService;
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@Tag(name = "file upload")
 	@Operation(summary = "Upload POST item")
-	@PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/admin/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<String> itemUpload(ItemRequestDto itemRequestDto) {
 		Item savedItem = itemService.saveItem(itemRequestDto);
 		for (MultipartFile multipartFile : itemRequestDto.getFiles()) {
@@ -54,6 +55,7 @@ public class ItemController {
 
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(itemRequestDto.getName() + "is Not Found!");
 		}
+
 
 	@Tag(name = "itemList")
 	@Operation(summary = "Get all items")
@@ -76,9 +78,10 @@ public class ItemController {
 		return ResponseEntity.notFound().build();
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@Tag(name = "updateItem")
 	@Operation(summary = "Update item")
-	@PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PutMapping(value = "/admin/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<String> updateItem(@PathVariable int id, ItemUpdateDto dto) {
 		ItemUpdateDto updateDto = ItemUpdateDto.builder()
 			.price(dto.getPrice())
@@ -93,9 +96,10 @@ public class ItemController {
 
 	}
 
+	@PreAuthorize("hasRole('ROLE_ADMIN')")
 	@Tag(name = "deleteItem")
 	@Operation(summary = "Delete item")
-	@DeleteMapping("/{id}")
+	@DeleteMapping("/admin/{id}")
 	public ResponseEntity<String> deleteItem(@PathVariable int id) {
 		ItemResponseDto item = itemService.getItem(id);
 		if (item != null) {

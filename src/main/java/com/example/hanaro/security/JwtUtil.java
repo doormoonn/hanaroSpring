@@ -10,7 +10,6 @@ import org.springframework.security.core.Authentication;
 import javax.crypto.SecretKey;
 
 import com.example.hanaro.dto.MemberDto;
-import com.example.hanaro.entity.Member;
 import com.example.hanaro.security.exception.CustomJwtException;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -36,7 +35,6 @@ public class JwtUtil {
 	}
 
 	public static Map<String, Object> validateToken(String token) {
-		// Claims claim = null;
 		Map<String, Object> claim = null;
 		SecretKey key = null;
 
@@ -67,8 +65,10 @@ public class JwtUtil {
 		MemberDto d = (MemberDto)authentication.getPrincipal();
 		MemberDto dto = new MemberDto(d.getEmail(), "", d.getNickname(), d.getRole());
 		Map<String, Object> claims = dto.getClaims();
-		claims.put("accessToken", JwtUtil.generateToken(claims, 10));
-		claims.put("refreshToken", JwtUtil.generateToken(claims, 60 * 24));
+		String accessToken = JwtUtil.generateToken(claims, 10);
+		String refreshToken = JwtUtil.generateToken(claims, 60 * 24);
+		claims.put("accessToken", accessToken);
+		claims.put("refreshToken", refreshToken);
 
 		return claims;
 	}

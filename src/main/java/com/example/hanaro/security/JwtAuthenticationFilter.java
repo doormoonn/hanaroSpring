@@ -25,15 +25,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
 	private final String[] excludePatterns = {
-		"/api/member/login",
-		"/api/member/login",
-		"/api/auth/**",
+		"/api/auth/signin",
 		"/member/signup",
 		"/api/public/**",
 		"/actuator/**",
 		"/swagger-ui/**",
 		"/v3/api-docs/**"
 	};
+
 
 	@Override
 	protected boolean shouldNotFilter(@NonNull HttpServletRequest request) throws ServletException {
@@ -55,13 +54,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			String email = (String)claims.get("email");
 			String nickname = (String)claims.get("nickname");
-			Role role = (Role)claims.get("role");
+			Role role = Role.valueOf((String)claims.get("role"));
 			MemberDto dto = new MemberDto(email, "", nickname, role);
 			UsernamePasswordAuthenticationToken authenticationToken = new
 				UsernamePasswordAuthenticationToken(dto, null, dto.getAuthorities());
 
 			// 올바른 Authorization을 저장하여 어디서든 불러올 수 있다!
 			SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+			filterChain.doFilter(request, response);
 		} catch (Exception e) {
 			e.printStackTrace(System.out);
 			response.setContentType("application/json");
@@ -70,6 +70,5 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 			out.println(objectMapper.writeValueAsString(Map.of("error", "ERROR_ACCESS_TOKEN")));
 			out.close();
 		}
-		filterChain.doFilter(request, response);
 	}
 }

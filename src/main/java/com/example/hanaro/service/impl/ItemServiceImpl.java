@@ -1,7 +1,9 @@
 package com.example.hanaro.service.impl;
 
+import java.awt.print.Pageable;
 import java.util.List;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -86,7 +88,7 @@ public class ItemServiceImpl implements ItemService {
 
 	@Override
 	public List<ItemResponseDto> searchItem(String itemname) {
-		List<Item> items = repository.findItemsByName(itemname);
+		List<Item> items = repository.findByNameLike(itemname);
 
 		return items.stream().map(item ->
 			ItemResponseDto.builder()
@@ -98,7 +100,6 @@ public class ItemServiceImpl implements ItemService {
 				.createdAt(item.getCreatedAt())
 				.images(imagesService.getItemImageDtos(item.getId()))
 				.build()).toList();
-
 	}
 
 }

@@ -30,7 +30,6 @@ import com.example.hanaro.security.handler.LoginSuccessHandler;
 @EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-
 	@Bean
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -39,29 +38,16 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-
 		http
 			.csrf(AbstractHttpConfigurer::disable)
 			.cors(config -> config.configurationSource(corsConfigurationSource()))
 			.sessionManagement(config -> config.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 			.formLogin(form -> form
-				.loginPage("/api/member/login")
-				.permitAll()
 				.successHandler(new LoginSuccessHandler())
 				.failureHandler(new LoginFailureHandler())
 			)
 			.exceptionHandling(config -> config.accessDeniedHandler(new CustomAccessDeiniedHandler()))
 			.addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
-
-
-		http
-			.authorizeHttpRequests((auth) -> auth
-				.requestMatchers("/**").permitAll() //todo
-				.requestMatchers("/member/login", "/login").not().authenticated()
-				.requestMatchers("/images/license/**", "/api/admin/**", "/admin/**").hasRole("ADMIN")
-				.requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()
-				.anyRequest().authenticated());
-
 
 		return http.build();
 	}
