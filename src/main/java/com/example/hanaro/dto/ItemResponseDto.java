@@ -1,5 +1,6 @@
 package com.example.hanaro.dto;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import lombok.AllArgsConstructor;
@@ -20,4 +21,7 @@ public class ItemResponseDto {
 	private int price;
 	private List<ItemImageDto> images;
 	private String content;
+
+	private LocalDateTime createdAt;
+	private LocalDateTime updatedAt;
 }

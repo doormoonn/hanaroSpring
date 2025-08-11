@@ -1,8 +1,8 @@
 package com.example.hanaro.service;
 
 import java.util.List;
-import java.util.Optional;
 
+import com.example.hanaro.dto.ItemDto;
 import com.example.hanaro.dto.ItemRequestDto;
 import com.example.hanaro.dto.ItemResponseDto;
 import com.example.hanaro.dto.ItemUpdateDto;
@@ -13,9 +13,11 @@ public interface ItemService {
 
 	ItemResponseDto getItem(int id);
 
-	List<Item> getAllItems();
+	List<ItemDto> getAllItems();
 
 	void updateItem(int id, ItemUpdateDto dto);
 
 	void deleteItem(int id);
+
+	List<ItemResponseDto> searchItem(String itemname);
 }

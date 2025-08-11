@@ -10,10 +10,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.hanaro.dto.ItemDto;
 import com.example.hanaro.dto.ItemRequestDto;
 import com.example.hanaro.dto.ItemResponseDto;
 import com.example.hanaro.dto.ItemUpdateDto;
@@ -53,16 +55,16 @@ public class ItemController {
 		return ResponseEntity.status(HttpStatus.NOT_FOUND).body(itemRequestDto.getName() + "is Not Found!");
 		}
 
-	@Tag(name = "item")
+	@Tag(name = "itemList")
 	@Operation(summary = "Get all items")
 	@GetMapping
-	public ResponseEntity<List<Item>> getAllItems() {
-		List<Item> items = itemService.getAllItems();
+	public ResponseEntity<List<ItemDto>> getAllItems() {
+		List<ItemDto> items = itemService.getAllItems();
 		return ResponseEntity.ok(items);
 	}
 
 
-	@Tag(name = "item")
+	@Tag(name = "itemDetail")
 	@Operation(summary = "Get item by ID")
 	@GetMapping("/{id}")
 	public ResponseEntity<ItemResponseDto> getItem(@PathVariable int id) {
@@ -74,20 +76,24 @@ public class ItemController {
 		return ResponseEntity.notFound().build();
 	}
 
-	@Tag(name = "item")
+	@Tag(name = "updateItem")
 	@Operation(summary = "Update item")
 	@PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<String> updateItem(@PathVariable int id, ItemUpdateDto dto) {
-		ItemResponseDto item = itemService.getItem(id);
-		if (item != null) {
-			itemService.updateItem(id, dto);
+		ItemUpdateDto updateDto = ItemUpdateDto.builder()
+			.price(dto.getPrice())
+			.stock(dto.getStock())
+			.content(dto.getContent())
+			.name(dto.getName())
+			.build();
+
+			itemService.updateItem(id, updateDto);
 
 			return ResponseEntity.ok("Item updated successfully");
-		}
-			return ResponseEntity.notFound().build();
+
 	}
 
-	@Tag(name = "item")
+	@Tag(name = "deleteItem")
 	@Operation(summary = "Delete item")
 	@DeleteMapping("/{id}")
 	public ResponseEntity<String> deleteItem(@PathVariable int id) {
@@ -99,4 +105,16 @@ public class ItemController {
 
 			return ResponseEntity.notFound().build();
 	}
+	@Tag(name = "itemSearch")
+	@Operation(summary = "Search item by itemName")
+	@GetMapping("/search/{itemname}")
+	public ResponseEntity<List<ItemResponseDto>> searchItem(@PathVariable String itemname) {
+		List<ItemResponseDto> item = itemService.searchItem(itemname);
+		if (item != null) {
+			return ResponseEntity.ok(item);
+		}
+
+		return ResponseEntity.notFound().build();
+	}
+
 }

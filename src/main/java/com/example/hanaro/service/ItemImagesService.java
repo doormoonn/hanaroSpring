@@ -2,6 +2,7 @@ package com.example.hanaro.service;
 
 import java.util.List;
 
+import com.example.hanaro.dto.ItemDto;
 import com.example.hanaro.dto.ItemImageDto;
 import com.example.hanaro.entity.Item;
 

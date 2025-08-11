@@ -11,7 +11,6 @@ import com.example.hanaro.entity.ItemImages;
 import com.example.hanaro.repository.ItemImagesRepository;
 import com.example.hanaro.service.ItemImagesService;
 
-import org.springframework.transaction.annotation.Transactional; // 이것으로 변경
 import lombok.RequiredArgsConstructor;
 
 @Service

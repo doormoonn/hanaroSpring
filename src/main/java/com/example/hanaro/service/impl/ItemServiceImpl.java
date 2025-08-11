@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.hanaro.dto.ItemDto;
 import com.example.hanaro.dto.ItemImageDto;
 import com.example.hanaro.dto.ItemRequestDto;
 import com.example.hanaro.dto.ItemResponseDto;
@@ -47,11 +48,24 @@ public class ItemServiceImpl implements ItemService {
 	}
 
 	@Override
-	public List<Item> getAllItems() {
-		return repository.findAll();
+	public List<ItemDto> getAllItems() {
+		List<Item> itemList = repository.findAll();
+		List<ItemDto> itemDtos = itemList.stream().map(item ->
+			ItemDto.builder()
+				.stock(item.getStock())
+				.content(item.getContent())
+				.price(item.getPrice())
+				.createdAt(item.getCreatedAt())
+				.updatedAt(item.getUpdatedAt())
+				.name(item.getName())
+				.build()
+		).toList();
+
+		return itemDtos;
 	}
 
 	@Override
+	@Transactional
 	public void updateItem(int id, ItemUpdateDto dto) {
 		Item item = Item.builder()
 			.stock(dto.getStock())
@@ -68,6 +82,23 @@ public class ItemServiceImpl implements ItemService {
 	public void deleteItem(int id) {
 		imagesService.deleteImg(id);
 		repository.deleteById(id);
+	}
+
+	@Override
+	public List<ItemResponseDto> searchItem(String itemname) {
+		List<Item> items = repository.findItemsByName(itemname);
+
+		return items.stream().map(item ->
+			ItemResponseDto.builder()
+				.stock(item.getStock())
+				.content(item.getContent())
+				.name(item.getName())
+				.price(item.getPrice())
+				.updatedAt(item.getUpdatedAt())
+				.createdAt(item.getCreatedAt())
+				.images(imagesService.getItemImageDtos(item.getId()))
+				.build()).toList();
+
 	}
 
 }
