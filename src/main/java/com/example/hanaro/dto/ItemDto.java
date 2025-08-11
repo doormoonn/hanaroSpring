@@ -1,4 +1,4 @@
 package com.example.hanaro.dto;
 
-public class ItemUpdateDto {
+public class ItemDto {
 }
