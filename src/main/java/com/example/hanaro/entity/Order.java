@@ -3,7 +3,10 @@ package com.example.hanaro.entity;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -38,6 +41,8 @@ public class Order extends BaseEntity{
 	private Member member;
 
 	@Enumerated(EnumType.STRING)
-	private OrderStatus status;
+	@ColumnDefault("'PAYED'")
+	@Column(nullable = false, length = 20)
+	private OrderStatus status = OrderStatus.PAYED;;
 
 }

@@ -37,7 +37,6 @@ public class Member extends BaseEntity {
 	private String nickname;
 
 	@Column(nullable = false, unique = true)
-	@Email
 	private String email;
 
 	@Column(nullable = false)

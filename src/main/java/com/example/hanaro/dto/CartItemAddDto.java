@@ -13,16 +13,11 @@ import lombok.Setter;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CartItemRequestDto {
+public class CartItemAddDto {
 	@NotBlank(message = "상품 이름은 필수입니다")
 	private String itemName;
 
 	@NotBlank(message = "수량을 선택해주세요")
 	@Min(value = 1, message = "1개이상 입력하세요")
 	private int quantity;
-
-	@NotBlank(message = "가격을 입력해주세요")
-	@Min(value = 1, message = "0원이상 입력하세요")
-	private int price;
-
 }

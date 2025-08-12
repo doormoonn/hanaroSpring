@@ -11,10 +11,12 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Entity
 @Builder
+@Setter
 @Table(name = "item")
 @AllArgsConstructor
 @NoArgsConstructor

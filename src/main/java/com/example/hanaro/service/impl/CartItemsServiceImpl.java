@@ -8,6 +8,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.hanaro.dto.CartItemAddDto;
+import com.example.hanaro.dto.CartItemDeleteDto;
 import com.example.hanaro.dto.CartItemRequestDto;
 import com.example.hanaro.dto.CartItemResponseDto;
 import com.example.hanaro.dto.CartItemUpdateDto;
@@ -34,18 +36,34 @@ public class CartItemsServiceImpl implements CartItemsService {
 
 	@Transactional
 	@Override
-	public void addCartItem(String name,CartItemRequestDto cartItemRequestDto) {
-		Item item = itemRepository.findFirstByName(cartItemRequestDto.getItemName()).orElseThrow();
+	public void addCartItem(String name, CartItemAddDto cartItemAddDto) {
+		Item item = itemRepository.findFirstByName(cartItemAddDto.getItemName()).orElseThrow();
 		Member member = memberRepository.findByNickname(name);
 
 		Cart cart = cartRepository.findById(member.getId()).orElseThrow();
 		CartItems items = CartItems.builder()
 			.cart(cart)
 			.item(item)
-			.quantity(cartItemRequestDto.getQuantity())
+			.quantity(cartItemAddDto.getQuantity())
 			.build();
 
 		repository.save(items);
+	}
+
+	@Override
+	public List<CartItemResponseDto> getCartItems(String name) {
+		Member member = memberRepository.findByNickname(name);
+		Cart cart = cartRepository.findById(member.getId()).orElseThrow();
+		List<CartItems> cartItemsByCart = repository.findCartItemsByCart(cart);
+
+		return cartItemsByCart.stream().map(c -> CartItemResponseDto.builder()
+			.itemName(c.getItem().getName())
+			.price(c.getItem().getPrice())
+			.quantity(c.getQuantity())
+			.build()
+		).toList();
+
+
 	}
 
 	@Transactional
@@ -59,5 +77,19 @@ public class CartItemsServiceImpl implements CartItemsService {
 
 		repository.save(cartItems);
 	}
+
+	@Transactional
+	@Override
+	public void deleteCartItem(String name, CartItemDeleteDto cartItemDeleteDto) {
+
+		Member member = memberRepository.findByNickname(name);
+		Cart cart = cartRepository.findById(member.getId()).orElseThrow();
+		Item item = itemRepository.findFirstByName(cartItemDeleteDto.getName()).orElseThrow();
+		CartItems cartItems = repository.findByCartAndItem(cart,item);
+
+		repository.delete(cartItems);
+
+	}
+
 
 }

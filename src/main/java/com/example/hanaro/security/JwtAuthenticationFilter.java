@@ -26,11 +26,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final String[] excludePatterns = {
 		"/api/auth/signin",
+		"/api/auth/signin/admin",
 		"/member/signup",
 		"/api/public/**",
 		"/actuator/**",
 		"/swagger-ui/**",
-		"/v3/api-docs/**"
+		"/v3/api-docs/**",
 	};
 
 
