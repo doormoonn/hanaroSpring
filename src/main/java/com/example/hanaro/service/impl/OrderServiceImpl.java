@@ -146,7 +146,8 @@ public class OrderServiceImpl implements OrderService {
 		runStatBatch();
 	}
 
-	@Scheduled(cron = "0 5 * * * *")
+	// 5분마다 실행되도록 크론 표현식을 수정했습니다.
+	@Scheduled(cron = "0 */5 * * * *")
 	public void updateStateBatch() throws Exception {
 		OrderStatus state = OrderStatus.PAYED;
 		while (state != OrderStatus.DELIVERED) {

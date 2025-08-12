@@ -15,12 +15,12 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 
 	@Modifying(clearAutomatically = true)
 	@Query("""
-        update Order o
-           set o.status = :next,
-               o.updatedAt = CURRENT_TIMESTAMP
-         where o.status = :current
-           and o.updatedAt <= :threshold
-    """)
+    update Order o
+       set o.status = :next,
+           o.updatedAt = CURRENT_TIMESTAMP
+     where o.status = :current
+       and o.updatedAt <= :threshold
+""")
 	int updateStateBatch(@Param("current") OrderStatus current,
 		@Param("threshold") java.time.LocalDateTime threshold,
 		@Param("next") OrderStatus next);

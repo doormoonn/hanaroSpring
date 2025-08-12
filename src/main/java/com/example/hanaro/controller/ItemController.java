@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -42,7 +43,7 @@ public class ItemController {
 	@Tag(name = "file upload")
 	@Operation(summary = "Upload POST item")
 	@PostMapping(value = "/admin/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<String> itemUpload(ItemRequestDto itemRequestDto) {
+	public ResponseEntity<String> itemUpload(@Validated ItemRequestDto itemRequestDto) {
 		Item savedItem = itemService.saveItem(itemRequestDto);
 		for (MultipartFile multipartFile : itemRequestDto.getFiles()) {
 			String uploadImage = fileUtil.uploadImage(multipartFile);

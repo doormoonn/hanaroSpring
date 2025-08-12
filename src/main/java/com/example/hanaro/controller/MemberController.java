@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.hanaro.comon.response.HttpResponse;
@@ -34,7 +35,7 @@ public class MemberController {
 	@Tag(name = "member")
 	@Operation(summary = "회원가입")
 	@PostMapping("/signup")
-	public ResponseEntity<?> signup(@Valid RegistMemberDto registMemberDto) {
+	public ResponseEntity<?> signup(@Validated RegistMemberDto registMemberDto) {
 		memberService.registMember(registMemberDto);
 
 		return ResponseEntity.ok().body(new HttpResponse(HttpStatus.OK, REGIST_SUCCESS.getMessage(), null));
