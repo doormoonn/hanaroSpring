@@ -28,7 +28,7 @@ public class SaleStat {
 
 	private int totamt;
 
-	// 이 부분을 추가하거나 수정해야 합니다.
+	// SaleItemStat 목록을 저장하기 위한 필드 추가 및 관계 설정
 	@OneToMany(mappedBy = "saledt", cascade = CascadeType.ALL)
 	private List<SaleItemStat> saleItemStats;
 

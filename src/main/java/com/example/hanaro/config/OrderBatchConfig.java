@@ -1,7 +1,6 @@
 package com.example.hanaro.config;
 
 import java.util.List;
-
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
@@ -10,22 +9,16 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.batch.item.ItemReader;
 import org.springframework.batch.item.data.RepositoryItemWriter;
 import org.springframework.batch.item.data.builder.RepositoryItemWriterBuilder;
-import org.springframework.batch.item.file.FlatFileItemReader;
-import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
-import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
-import org.springframework.context.annotation.Bean;
+import org.springframework.batch.item.support.ListItemReader;
 import org.springframework.beans.factory.annotation.Value;
-
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
-
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.example.hanaro.entity.Item;
-import com.example.hanaro.entity.Order;
-import com.example.hanaro.entity.OrderItems;
 import com.example.hanaro.repository.ItemRepository;
 import com.example.hanaro.repository.OrderRepository;
 import com.example.hanaro.stat.entity.SaleItemStat;
@@ -41,7 +34,6 @@ public class OrderBatchConfig {
 	private final SaleStatRepository statRepository;
 	private final ItemRepository itemRepository;
 
-
 	@Bean
 	public Job statJob(JobRepository jobRepository, Step statStep) {
 		return new JobBuilder("statJob", jobRepository)
@@ -53,9 +45,9 @@ public class OrderBatchConfig {
 	@Bean
 	public Step statStep(JobRepository jobRepository,
 		PlatformTransactionManager transactionManager) {
-		return new StepBuilder("csvStep", jobRepository)
+		return new StepBuilder("statStep", jobRepository)
 			.<SaleStat, SaleStat>chunk(5, transactionManager)
-			.reader(statReader())
+			.reader(statReader(null))
 			.processor(statProcessor(null))
 			.writer(statWriter())
 			.build();
@@ -72,24 +64,21 @@ public class OrderBatchConfig {
 				.build();
 			System.out.println("bbb - todayStat = " + todayStat);
 
-			// 네이티브 쿼리 반환 타입인 List<Object[]>를 사용
 			List<Object[]> oitemsData = orderRepository.getTodayItemStat(saledt);
 			List<SaleItemStat> todayItems = oitemsData.stream()
 				.map(itemData -> {
-					// Object[] 배열에서 값 추출 및 타입 캐스팅
 					Integer itemId = (Integer) itemData[0];
 					Long quantity = (Long) itemData[1];
 					Long totalPrice = (Long) itemData[2];
 
-					// Item 객체를 조회하여 SaleItemStat에 설정
 					Item item = itemRepository.findById(itemId)
 						.orElseThrow(() -> new IllegalArgumentException("Item not found with id: " + itemId));
 
 					return SaleItemStat.builder()
 						.saledt(todayStat)
 						.item(item)
-						.amt(totalPrice.intValue()) // 총액
-						.cnt(quantity.intValue()) // 수량
+						.amt(totalPrice.intValue())
+						.cnt(quantity.intValue())
 						.build();
 				})
 				.toList();
@@ -105,26 +94,12 @@ public class OrderBatchConfig {
 
 	@Bean
 	@StepScope
-	// memoReader(@Value("#{jobParameters['filePath']}") String filePath) {
-	protected FlatFileItemReader<SaleStat> statReader() {
-		return new FlatFileItemReaderBuilder<SaleStat>()
-			.name("statReader")
-			.resource(new ClassPathResource("stat.csv"))
-			.linesToSkip(1)
-			.delimited()
-			.names("saleText", "state")
-			.fieldSetMapper(new BeanWrapperFieldSetMapper<>() {{
-				setTargetType(SaleStat.class);
-			}}).build();
+	public ItemReader<SaleStat> statReader(@Value("#{jobParameters['saledt']}") String saledt) {
+		SaleStat todayStat = orderRepository.getTodayStat(saledt);
+		System.out.println("bbr - todayStat = " + todayStat);
+		return new ListItemReader<>(List.of(todayStat));
 	}
 
-	// @Bean
-	// @StepScope
-	// public RepositoryItemReader repReader() {
-	// 	return new RepositoryItemReaderBuilder<Member>(MemberRepository )
-	// 		.methodName("findAll")
-	// 		.build();
-	// }
 
 	@Bean
 	public RepositoryItemWriter<SaleStat> statWriter() {
@@ -133,5 +108,4 @@ public class OrderBatchConfig {
 			.methodName("save")
 			.build();
 	}
-
 }

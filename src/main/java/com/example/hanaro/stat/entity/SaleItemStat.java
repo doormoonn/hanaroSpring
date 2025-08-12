@@ -1,8 +1,6 @@
 package com.example.hanaro.stat.entity;
 
-
 import com.example.hanaro.entity.Item;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -31,7 +29,8 @@ public class SaleItemStat {
 	private SaleStat saledt;
 
 	@ManyToOne
-	@JoinColumn(name = "item")
+	// JoinColumn 이름을 'item_id'로 수정했습니다.
+	@JoinColumn(name = "item_id")
 	private Item item;
 
 	private int cnt;
