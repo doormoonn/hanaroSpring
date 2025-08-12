@@ -27,15 +27,15 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
 		@Param("threshold") java.time.LocalDateTime threshold,
 		@Param("next") OrderStatus next);
 
-	@Query(value = "select 'today' saledt, count(*) ordercnt, 0 totamt from Orders o"
-		+ " where o.createdAt between concat(:saledt, ' 00:00:00.00') and concat(:saledt, ' 23:59:59.99')", nativeQuery = true)
-	public SaleStat getTodayStat(@Param("saledt") String saledt);
-
 	@Query(value =
-		"select oi.item as id, max(oi.id) as orders, oi.item, sum(oi.cnt) as cnt, sum(oi.cnt * oi.price) as price"
-			+ "  from Orders o inner join OrderItem oi on o.id = oi.orders"
-			+ " where o.createdAt between concat(:saledt, ' 00:00:00.00') and concat(:saledt, ' 23:59:59.99')"
-			+ " group by oi.item", nativeQuery = true)
-	public List<OrderItems> getTodayItemStat(@Param("saledt") String saledt);
+		"select oi.item_id as item, "
+			+ "sum(oi.quantity) as quantity, "
+			+ "sum(oi.quantity * i.price) as price "
+			+ "from orders o inner join order_items oi on o.id = oi.order_id "
+			+ "inner join item i on oi.item_id = i.id "
+			+ "where o.created_at between concat(:saledt, ' 00:00:00.00') and concat(:saledt, ' 23:59:59.99') "
+			+ "group by oi.item_id", nativeQuery = true)
+	List<Object[]> getTodayItemStat(@Param("saledt") String saledt);
+
 
 }

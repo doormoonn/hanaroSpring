@@ -28,6 +28,10 @@ public class SaleStat {
 
 	private int totamt;
 
+	// 이 부분을 추가하거나 수정해야 합니다.
+	@OneToMany(mappedBy = "saledt", cascade = CascadeType.ALL)
+	private List<SaleItemStat> saleItemStats;
+
 	@Override
 	public String toString() {
 		return "SaleStat{" +

@@ -45,4 +45,7 @@ public class Order extends BaseEntity{
 	@Column(nullable = false, length = 20)
 	private OrderStatus status = OrderStatus.PAYED;;
 
+	@Column(columnDefinition = "DATETIME(0)")
+	private java.time.LocalDateTime statedAt;
+
 }
