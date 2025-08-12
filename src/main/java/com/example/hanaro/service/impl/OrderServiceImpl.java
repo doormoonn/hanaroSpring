@@ -50,6 +50,7 @@ public class OrderServiceImpl implements OrderService {
 
 
 	@Override
+	@Transactional
 	public OrderResponseDto getOrder(int userId) {
 		Member member = memberRepository.findById(userId).orElseThrow();
 		List<Order> orders = orderRepository.findByMember(member);
@@ -142,12 +143,14 @@ public class OrderServiceImpl implements OrderService {
 	}
 
 	@Scheduled(cron = "59 59 23 * * *")
+	@Transactional
 	public void batchStatistics() throws Exception {
 		runStatBatch();
 	}
 
 	// 5분마다 실행되도록 크론 표현식을 수정했습니다.
 	@Scheduled(cron = "0 */5 * * * *")
+	@Transactional
 	public void updateStateBatch() throws Exception {
 		OrderStatus state = OrderStatus.PAYED;
 		while (state != OrderStatus.DELIVERED) {
