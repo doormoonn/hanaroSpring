@@ -3,6 +3,7 @@ package com.example.hanaro.service.impl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
@@ -16,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.hanaro.dto.OrderItemsResponseDto;
 import com.example.hanaro.dto.OrderResponseDto;
+import com.example.hanaro.dto.SaleItemStatDto;
+import com.example.hanaro.dto.SaleStatResponseDto;
 import com.example.hanaro.entity.Cart;
 import com.example.hanaro.entity.CartItems;
 import com.example.hanaro.entity.Item;
@@ -30,6 +33,8 @@ import com.example.hanaro.repository.MemberRepository;
 import com.example.hanaro.repository.OrderItemsRepository;
 import com.example.hanaro.repository.OrderRepository;
 import com.example.hanaro.service.OrderService;
+import com.example.hanaro.stat.entity.SaleStat;
+import com.example.hanaro.stat.repository.SaleStatRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +52,7 @@ public class OrderServiceImpl implements OrderService {
 	private final ItemRepository itemRepository;
 	private final JobLauncher jobLauncher;
 	private final Job statJob;
+	private final SaleStatRepository saleStatRepository;
 
 
 	@Override
@@ -167,6 +173,66 @@ public class OrderServiceImpl implements OrderService {
 
 			state = state.getNextState();
 		}
+	}
+
+	@Override
+	public SaleStatResponseDto getSaleStat(String date) {
+		SaleStat saleStat = saleStatRepository.findBySaledt(date)
+			.orElseThrow(() -> new IllegalArgumentException("No sales data found for the given date: " + date));
+
+		List<SaleItemStatDto> saleItemStatDtos = saleStat.getSaleItemStats().stream()
+			.map(itemStat -> SaleItemStatDto.builder()
+				.itemName(itemStat.getItem().getName())
+				.count(itemStat.getCnt())
+				.amount(itemStat.getAmt())
+				.build())
+			.collect(Collectors.toList());
+
+		return SaleStatResponseDto.builder()
+			.saleDate(saleStat.getSaledt())
+			.totalOrderCount(saleStat.getOrdercnt())
+			.totalAmount(saleStat.getTotamt())
+			.saleItems(saleItemStatDtos)
+			.build();
+	}
+
+	@Override
+	public SaleStatResponseDto getTotalSaleStat() {
+		List<SaleStat> allSaleStats = saleStatRepository.findAll();
+
+		int totalOrderCount = allSaleStats.stream()
+			.mapToInt(SaleStat::getOrdercnt)
+			.sum();
+		int totalAmount = allSaleStats.stream()
+			.mapToInt(SaleStat::getTotamt)
+			.sum();
+
+		List<SaleItemStatDto> totalSaleItems = allSaleStats.stream()
+			.flatMap(saleStat -> saleStat.getSaleItemStats().stream())
+			.collect(Collectors.groupingBy(
+				itemStat -> itemStat.getItem().getName(),
+				Collectors.collectingAndThen(
+					Collectors.toList(),
+					list -> {
+						int totalCount = list.stream().mapToInt(com.example.hanaro.stat.entity.SaleItemStat::getCnt).sum();
+						int totalItemAmount = list.stream().mapToInt(com.example.hanaro.stat.entity.SaleItemStat::getAmt).sum();
+						return SaleItemStatDto.builder()
+							.itemName(list.get(0).getItem().getName())
+							.count(totalCount)
+							.amount(totalItemAmount)
+							.build();
+					}
+				)
+			))
+			.values().stream().collect(Collectors.toList());
+
+
+		return SaleStatResponseDto.builder()
+			.saleDate("Total")
+			.totalOrderCount(totalOrderCount)
+			.totalAmount(totalAmount)
+			.saleItems(totalSaleItems)
+			.build();
 	}
 
 }

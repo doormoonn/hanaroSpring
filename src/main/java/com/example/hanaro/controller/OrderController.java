@@ -9,11 +9,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.hanaro.dto.OrderResponseDto;
+import com.example.hanaro.dto.SaleStatResponseDto;
 import com.example.hanaro.service.OrderService;
-import com.example.hanaro.service.impl.OrderServiceImpl;
 
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,18 @@ public class OrderController {
 	public ResponseEntity<OrderResponseDto> getUserOrders(@PathVariable("userId") int userId) {
 		OrderResponseDto order = orderService.getOrder(userId);
 		return ResponseEntity.ok(order);
+	}
+
+	@GetMapping("/sales")
+	public ResponseEntity<SaleStatResponseDto> getSales(@RequestParam String date) {
+		SaleStatResponseDto saleStat = orderService.getSaleStat(date);
+		return ResponseEntity.ok(saleStat);
+	}
+
+	@GetMapping("/sales/total")
+	public ResponseEntity<SaleStatResponseDto> getTotalSales() {
+		SaleStatResponseDto saleStat = orderService.getTotalSaleStat();
+		return ResponseEntity.ok(saleStat);
 	}
 
 
